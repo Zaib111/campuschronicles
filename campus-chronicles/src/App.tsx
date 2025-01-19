@@ -81,6 +81,12 @@ const App = () => {
         antialias: true
       });
 
+      mapInstance.on('click', (e) => {
+        if (isAddingMemory) {
+          setSelectedLocation([e.lngLat.lng, e.lngLat.lat]);
+        }
+      });
+
       mapInstance.on('load', () => {
         // Add 3D buildings
         mapInstance.addLayer({
