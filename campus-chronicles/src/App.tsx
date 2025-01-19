@@ -5,6 +5,7 @@ import { getFirestore, collection, addDoc, getDocs, Timestamp } from "firebase/f
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getAnalytics } from "firebase/analytics";
 import 'mapbox-gl/dist/mapbox-gl.css';
+import './index.css'; // Import the CSS file from the index folder
 import './App.css'; // Include the styles from your CSS
 import Profile from './components/Profile';
 
