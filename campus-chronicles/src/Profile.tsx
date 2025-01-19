@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Memory } from './App.tsx'; // Assuming Memory interface is defined in App.tsx
 import './Profile.css'; // Add this import
-import { useUser, useClerk } from '@clerk/clerk-react';
+import { useUser, useClerk, SignedIn, RedirectToSignIn } from '@clerk/clerk-react';
+import { useNavigate } from 'react-router-dom';
 
 interface ProfileProps {
   userName: string;
@@ -15,11 +16,31 @@ interface MemoryModalProps {
   onClose: () => void;
 }
 
-const Profile: React.FC<ProfileProps> = ({ userName, memories, userGroups, onBack }) => {
+const Profile: React.FC<ProfileProps> = ({ userName, memories = [], onBack }) => {
+  const navigate = useNavigate();
   const { user } = useUser();
   const { signOut } = useClerk();
   const [selectedMemory, setSelectedMemory] = useState<Memory | null>(null);
   const [suggestedMemories, setSuggestedMemories] = useState<Memory[]>([]);
+
+  console.log('Profile rendering with:', {
+    userName,
+    memoriesLength: memories.length,
+    user: user,
+  });
+
+  // Add safety check
+  if (!user) {
+    console.log('No user found, showing loading state');
+    return (
+      <div className="profile-page">
+        <div className="profile-container">
+          <button className="back-to-map" onClick={() => navigate('/app')}>Back to Map</button>
+          <p>Loading user data...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Get the 3 most recent memories from the current user
   const recentMemories = useMemo(() => {
@@ -90,122 +111,124 @@ const Profile: React.FC<ProfileProps> = ({ userName, memories, userGroups, onBac
   );
 
   return (
-    <div className="profile-page">
-      <div className="profile-container">
-        <button 
-          className="back-to-map"
-          onClick={onBack}
-        >
-          Back to Map
-        </button>
+    <SignedIn>
+      <div className="profile-page">
+        <div className="profile-container">
+          <button 
+            className="back-to-map"
+            onClick={() => navigate('/app')}
+          >
+            Back to Map
+          </button>
 
-        <button 
-          className="sign-out-btn"
-          onClick={() => signOut()}
-        >
-          Sign Out
-        </button>
+          <button 
+            className="sign-out-btn"
+            onClick={() => signOut()}
+          >
+            Sign Out
+          </button>
 
-        <div className="profile-header">
-          <div className="profile-avatar">
-            {user?.imageUrl ? (
-              <div className="avatar-circle">
-                <img 
-                  src={user.imageUrl} 
-                  alt={`${userName}'s profile`}
-                  className="avatar-image"
-                />
-              </div>
-            ) : (
-              <div className="avatar-circle">
-                {userName.charAt(0).toUpperCase()}
-              </div>
-            )}
-          </div>
-          {user && <p className="user-email">{user.primaryEmailAddress?.emailAddress}</p>}
-        </div>
-
-        <div className="content-wrapper">
-          <div className="memories-section">
-            <h2>Your Recent Memories</h2>
-            <div className="memories-grid">
-              {recentMemories.map((memory, index) => (
-                <div 
-                  key={memory.id || index} 
-                  className="memory-card"
-                  onClick={() => setSelectedMemory(memory)}
-                >
-                  {memory.imageUrl ? (
-                    <img 
-                      src={memory.imageUrl} 
-                      alt={memory.title}
-                      className="memory-image"
-                    />
-                  ) : (
-                    <div className="memory-placeholder">
-                      <span className="memory-category">{memory.category}</span>
-                    </div>
-                  )}
-                  <div className="memory-info">
-                    <h3>{memory.title}</h3>
-                    <p>{memory.description}</p>
-                    <div className="memory-metadata">
-                      <span className="memory-date">
-                        {memory.timestamp?.toDate().toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
+          <div className="profile-header">
+            <div className="profile-avatar">
+              {user?.imageUrl ? (
+                <div className="avatar-circle">
+                  <img 
+                    src={user.imageUrl} 
+                    alt={`${userName}'s profile`}
+                    className="avatar-image"
+                  />
                 </div>
-              ))}
+              ) : (
+                <div className="avatar-circle">
+                  {userName.charAt(0).toUpperCase()}
+                </div>
+              )}
             </div>
+            {user && <p className="user-email">{user.primaryEmailAddress?.emailAddress}</p>}
           </div>
 
-          <div className="memories-section">
-            <h2>Suggested Posts</h2>
-            <div className="memories-grid">
-              {suggestedMemories.map((memory, index) => (
-                <div 
-                  key={memory.id || index} 
-                  className="memory-card"
-                  onClick={() => setSelectedMemory(memory)}
-                >
-                  {memory.imageUrl ? (
-                    <img 
-                      src={memory.imageUrl} 
-                      alt={memory.title}
-                      className="memory-image"
-                    />
-                  ) : (
-                    <div className="memory-placeholder">
-                      <span className="memory-category">{memory.category}</span>
-                    </div>
-                  )}
-                  <div className="memory-info">
-                    <h3>{memory.title}</h3>
-                    <p>{memory.description}</p>
-                    <div className="memory-metadata">
-                      <div className="memory-author">
-                        <span className="author-email">{memory.user.email}</span>
+          <div className="content-wrapper">
+            <div className="memories-section">
+              <h2>Your Recent Memories</h2>
+              <div className="memories-grid">
+                {recentMemories.map((memory, index) => (
+                  <div 
+                    key={memory.id || index} 
+                    className="memory-card"
+                    onClick={() => setSelectedMemory(memory)}
+                  >
+                    {memory.imageUrl ? (
+                      <img 
+                        src={memory.imageUrl} 
+                        alt={memory.title}
+                        className="memory-image"
+                      />
+                    ) : (
+                      <div className="memory-placeholder">
+                        <span className="memory-category">{memory.category}</span>
                       </div>
-                      <span className="memory-date">
-                        {memory.timestamp?.toDate().toLocaleDateString()}
-                      </span>
+                    )}
+                    <div className="memory-info">
+                      <h3>{memory.title}</h3>
+                      <p>{memory.description}</p>
+                      <div className="memory-metadata">
+                        <span className="memory-date">
+                          {memory.timestamp?.toDate().toLocaleDateString()}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            </div>
+
+            <div className="memories-section">
+              <h2>Suggested Posts</h2>
+              <div className="memories-grid">
+                {suggestedMemories.map((memory, index) => (
+                  <div 
+                    key={memory.id || index} 
+                    className="memory-card"
+                    onClick={() => setSelectedMemory(memory)}
+                  >
+                    {memory.imageUrl ? (
+                      <img 
+                        src={memory.imageUrl} 
+                        alt={memory.title}
+                        className="memory-image"
+                      />
+                    ) : (
+                      <div className="memory-placeholder">
+                        <span className="memory-category">{memory.category}</span>
+                      </div>
+                    )}
+                    <div className="memory-info">
+                      <h3>{memory.title}</h3>
+                      <p>{memory.description}</p>
+                      <div className="memory-metadata">
+                        <div className="memory-author">
+                          <span className="author-email">{memory.user.email}</span>
+                        </div>
+                        <span className="memory-date">
+                          {memory.timestamp?.toDate().toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
 
-        {selectedMemory && (
-          <MemoryModal 
-            memory={selectedMemory} 
-            onClose={() => setSelectedMemory(null)} 
-          />
-        )}
+          {selectedMemory && (
+            <MemoryModal 
+              memory={selectedMemory} 
+              onClose={() => setSelectedMemory(null)} 
+            />
+          )}
+        </div>
       </div>
-    </div>
+    </SignedIn>
   );
 };
 

@@ -9,6 +9,7 @@ import './index.css'; // Import the CSS file from the index folder
 import './App.css'; // Include the styles from your CSS
 import Profile from './Profile';
 import { useUser } from '@clerk/clerk-react';
+import { useNavigate } from 'react-router-dom';
 
 // Your existing Firebase config
 const firebaseConfig = {
@@ -73,6 +74,7 @@ const App = () => {
   });
   const [showProfile, setShowProfile] = useState(false);
   const { user } = useUser();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const initMap = () => {
@@ -491,7 +493,7 @@ const App = () => {
                 </button>
                 <button 
                   className="profile-btn"
-                  onClick={() => setShowProfile(true)}
+                  onClick={() => navigate('/profile')}
                 >
                   Profile
                 </button>
