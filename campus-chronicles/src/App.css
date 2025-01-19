@@ -142,12 +142,14 @@ body, html {
   left: 20px;
   right: 20px;
   z-index: 1;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 1rem;
-  border-radius: 8px;
+  background: rgba(18, 18, 18, 0.85);
+  padding: 1.2rem 1.8rem;
+  border-radius: 16px;
   max-width: 1200px;
   margin: 0 auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .header {
@@ -158,9 +160,69 @@ body, html {
   margin: 0 auto;
 }
 
+.header h1 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin: 0;
+  background: linear-gradient(45deg, #00f2fe, #4facfe);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  letter-spacing: -0.5px;
+}
+
 .controls {
   display: flex;
-  gap: 1rem;
+  gap: 1.2rem;
+  align-items: center;
+}
+
+.controls select {
+  padding: 0.6rem 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(5px);
+}
+
+.controls select:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.add-memory-btn, 
+.profile-btn {
+  padding: 0.6rem 1.4rem;
+  background: linear-gradient(45deg, #00f2fe, #4facfe);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(79, 172, 254, 0.3);
+}
+
+.add-memory-btn:hover, 
+.profile-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+  filter: brightness(1.1);
+}
+
+.add-memory-btn.active {
+  background: linear-gradient(45deg, #FF416C, #FF4B2B);
+}
+
+.add-memory-btn.active:hover {
+  background: linear-gradient(45deg, #FF416C, #FF4B2B);
+  filter: brightness(1.1);
 }
 
 .memory-form {
@@ -185,24 +247,17 @@ body, html {
   padding: 0.5rem;
 }
 
-.add-memory-btn {
-  padding: 0.5rem 1rem;
-  background: #FFD700;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.add-memory-btn.active {
-  background: #FF4444;
-  color: white;
-}
-
 .form-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+  color: #333;
+}
+
+.form-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
 }
 
 .close-btn {
@@ -211,6 +266,7 @@ body, html {
   font-size: 1.5rem;
   cursor: pointer;
   padding: 0.5rem;
+  color: #333;
 }
 
 .save-memory-btn {
@@ -227,4 +283,71 @@ body, html {
 
 .save-memory-btn:hover {
   background: #FFC700;
+}
+
+.profile-btn {
+  padding: 0.5rem 1rem;
+  background: #FFD700;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 1rem;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.profile-btn:hover {
+  background: #FFC700;
+}
+
+/* Add styles for navigation in Profile component */
+.back-to-map {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  padding: 0.5rem 1rem;
+  background: #FFD700;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  z-index: 10;
+  transition: background-color 0.2s;
+}
+
+.back-to-map:hover {
+  background: #FFC700;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.form-group input[type="file"] {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+}
+
+.image-preview {
+  margin: 10px 0;
+  text-align: center;
+  background: #f5f5f5;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.selected-file {
+  margin-top: 5px;
+  font-size: 0.9rem;
+  color: #666;
 }
