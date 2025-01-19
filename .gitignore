@@ -1,0 +1,40 @@
+# Ignore everything
+*
+
+# But don't ignore these directories
+!campus-chronicles/
+!campus-chronicles/src/
+!campus-chronicles/public/
+
+# And don't ignore these specific files
+!campus-chronicles/src/App.tsx
+!campus-chronicles/src/App.css
+!campus-chronicles/src/index.tsx
+!campus-chronicles/src/index.css
+!campus-chronicles/public/index.html
+!.gitignore
+!README.md
+!package.json
+!tsconfig.json
+
+# Node modules and build directories
+node_modules/
+build/
+dist/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
