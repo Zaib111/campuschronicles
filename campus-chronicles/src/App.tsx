@@ -4,6 +4,7 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import 'firebase/compat/analytics';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import './index.css'; // Import the CSS file from the index folder
 import './App.css'; // Include the styles from your CSS
 
 // Firebase configuration

@@ -1,9 +1,14 @@
-/** @type {import('tailwindcss').Config} */
-export default {
-  content: [],
+// filepath: /c:/Users/firasaj/Documents/campuschronicles/campus-chronicles/tailwind.config.js
+module.exports = {
+  content: [
+    "./src/**/*.{js,jsx,ts,tsx}",
+  ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        lora: ['Lora', 'serif'],
+      }
+    },
   },
   plugins: [],
 }
-
