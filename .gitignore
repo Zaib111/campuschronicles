@@ -12,6 +12,8 @@
 !campus-chronicles/src/index.tsx
 !campus-chronicles/src/index.css
 !campus-chronicles/public/index.html
+!campus-chronicles/components/Profile.css
+!campus-chronicles/components/Profile.tsx
 !.gitignore
 !README.md
 !package.json
