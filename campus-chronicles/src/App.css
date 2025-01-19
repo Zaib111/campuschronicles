@@ -83,6 +83,41 @@ body, html {
   box-shadow: 0 0 10px rgba(123, 104, 238, 0.5);
 }
 
+.marker-hackathon {
+  background-color: #32CD32;
+  box-shadow: 0 0 10px rgba(50, 205, 50, 0.5);
+}
+
+.marker-work {
+  background-color: #4169E1;
+  box-shadow: 0 0 10px rgba(65, 105, 225, 0.5);
+}
+
+.marker-friends {
+  background-color: #FF4500;
+  box-shadow: 0 0 10px rgba(255, 69, 0, 0.5);
+}
+
+.marker-food {
+  background-color: #FF8C00;
+  box-shadow: 0 0 10px rgba(255, 140, 0, 0.5);
+}
+
+.marker-sports {
+  background-color: #20B2AA;
+  box-shadow: 0 0 10px rgba(32, 178, 170, 0.5);
+}
+
+.marker-club {
+  background-color: #BA55D3;
+  box-shadow: 0 0 10px rgba(186, 85, 211, 0.5);
+}
+
+.marker-research {
+  background-color: #4B0082;
+  box-shadow: 0 0 10px rgba(75, 0, 130, 0.5);
+}
+
 .memory-popup {
   padding: 15px;
   max-width: 250px;
@@ -119,6 +154,13 @@ body, html {
   font-size: 12px;
   color: #666;
   margin-top: 5px;
+  font-style: italic;
+}
+
+.memory-popup .author {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #eee;
 }
 
 .app-container {
@@ -351,3 +393,116 @@ body, html {
   font-size: 0.9rem;
   color: #666;
 }
+
+.title-gradient {
+  font-size: 2.8rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #6366f1, #2563eb, #3b82f6, #38bdf8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  letter-spacing: -0.5px;
+  position: relative;
+  padding: 0.5rem 0;
+}
+
+.title-gradient::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+  border-radius: 2px;
+  opacity: 0.7;
+}
+
+.nearby-memories-grid {
+  display: grid;
+  gap: 1.5rem;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.nearby-memory-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #eee;
+}
+
+.nearby-memory-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.nearby-memory-info {
+  padding: 1rem;
+}
+
+.nearby-memory-user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.nearby-memory-user span {
+  color: #666;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-initial {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  color: #666;
+}
+
+.nearby-memory-info h3 {
+  margin: 0.5rem 0;
+  color: #333;
+}
+
+.nearby-memory-info p {
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+/* Update category tag colors in memory cards */
+.memory-category {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: white;
+}
+
+.memory-category[data-category="study"] { background-color: #FFD700; }
+.memory-category[data-category="hangout"] { background-color: #FF69B4; }
+.memory-category[data-category="event"] { background-color: #7B68EE; }
+.memory-category[data-category="hackathon"] { background-color: #32CD32; }
+.memory-category[data-category="work"] { background-color: #4169E1; }
+.memory-category[data-category="friends"] { background-color: #FF4500; }
+.memory-category[data-category="food"] { background-color: #FF8C00; }
+.memory-category[data-category="sports"] { background-color: #20B2AA; }
+.memory-category[data-category="club"] { background-color: #BA55D3; }
+.memory-category[data-category="research"] { background-color: #4B0082; }

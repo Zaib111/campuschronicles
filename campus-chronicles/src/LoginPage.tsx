@@ -19,7 +19,7 @@ const LoginPage = () => {
         <div className="bg-[url('/bgImage.jpg')] ] bg-cover w-screen h-screen">
           <header className="text-center">
             <div className="flex flex-col items-center justify-center pt-8">
-              <h1 className="text-7xl font-bold font-lora text-black pt-4">Campus Chronicles</h1>
+              <h1 className="title-gradient font-inter">Campus Chronicles</h1>
               <img 
                 src="public/cc-logo.png" 
                 alt="Campus Chronicles Logo" 

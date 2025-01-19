@@ -7,7 +7,8 @@ import { getAnalytics } from "firebase/analytics";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './index.css'; // Import the CSS file from the index folder
 import './App.css'; // Include the styles from your CSS
-import Profile from './components/Profile';
+import Profile from './Profile';
+import { useUser } from '@clerk/clerk-react';
 
 // Your existing Firebase config
 const firebaseConfig = {
@@ -32,15 +33,18 @@ export interface Memory {
   description: string;
   lat: number;
   lng: number;
-  category: 'study' | 'hangout' | 'event';
-  user: string;
+  category: 'study' | 'hangout' | 'event' | 'hackathon' | 'work' | 'friends' | 'food' | 'sports' | 'club' | 'research';
+  user: {
+    id: string;
+    name: string;
+    imageUrl?: string;
+    email?: string;
+  };
   timestamp: Timestamp;
-  images?: string[]; // Array of image URLs
-  audioNote?: string; // URL to audio file
-  participants?: string[]; // Array of tagged friends
-  location: string; // Specific building/location name
-  isPublic: boolean; // Whether memory is public or private
-  imageUrl?: string | null; // Add this line
+  images?: string[];
+  imageUrl: string | null;
+  location: string;
+  isPublic: boolean;
 }
 
 interface SaveMemoryParams {
@@ -68,6 +72,7 @@ const App = () => {
     imagePreview: '' as string
   });
   const [showProfile, setShowProfile] = useState(false);
+  const { user } = useUser();
 
   useEffect(() => {
     const initMap = () => {
@@ -242,6 +247,13 @@ const App = () => {
             <option value="study">Study</option>
             <option value="hangout">Hangout</option>
             <option value="event">Event</option>
+            <option value="hackathon">Hackathon</option>
+            <option value="work">Work</option>
+            <option value="friends">Friends</option>
+            <option value="food">Food</option>
+            <option value="sports">Sports</option>
+            <option value="club">Club</option>
+            <option value="research">Research</option>
           </select>
           <div className="form-group">
             <label htmlFor="image">Upload Image (optional)</label>
@@ -305,16 +317,7 @@ const App = () => {
 
         // Create popup
         const popup = new mapboxgl.Popup({ offset: 25 })
-          .setHTML(`
-            <div class="memory-popup">
-              <h3>${memory.title}</h3>
-              <p>${memory.description}</p>
-              ${memory.imageUrl ? `<img src="${memory.imageUrl}" alt="Memory" style="max-width: 200px; margin-top: 10px;">` : ''}
-              <span class="category-tag">${memory.category}</span>
-              <span class="author">By ${memory.user || 'Anonymous'}</span>
-              <span class="date">${memory.timestamp?.toDate().toLocaleDateString()}</span>
-            </div>
-          `);
+          .setHTML(createPopupContent(memory));
 
         // Add marker to map
         new mapboxgl.Marker(el)
@@ -327,47 +330,120 @@ const App = () => {
     }
   };
 
-  const saveMemory = async ({
-    lat, lng, title, description, category, image }: SaveMemoryParams): Promise<void> => {
-    console.log('Starting memory save with image:', image);
+  const compressImage = async (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 800;
+          const MAX_HEIGHT = 600;
+          let width = img.width;
+          let height = img.height;
 
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          // Compress and convert to base64
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+          resolve(compressedBase64);
+        };
+        img.onerror = reject;
+      };
+      reader.onerror = reject;
+    });
+  };
+
+  const saveMemory = async ({
+    lat, lng, title, description, category, image
+  }: SaveMemoryParams): Promise<void> => {
     try {
-      let imageUrl = null;
-      
-      // Convert image to base64 if one was selected
-      if (image) {
-        const reader = new FileReader();
-        imageUrl = await new Promise((resolve) => {
-          reader.onload = () => resolve(reader.result as string);
-          reader.readAsDataURL(image);
-        });
+      if (!user) {
+        throw new Error('User must be logged in to save memories');
       }
 
-      // Create memory object
+      let imageUrl: string | null = null;
+      
+      if (image) {
+        try {
+          const compressedImage = await compressImage(image);
+          imageUrl = compressedImage;
+          console.log('Image compressed and converted successfully');
+        } catch (error) {
+          console.error('Error processing image:', error);
+          throw new Error('Failed to process image');
+        }
+      }
+
+      const userEmail = user.primaryEmailAddress?.emailAddress;
+      if (!userEmail) {
+        throw new Error('User email not found');
+      }
+
       const memoryData = {
         title,
         description,
         lat,
         lng,
         category,
-        user: localStorage.getItem('userName') || 'Anonymous',
+        user: {
+          id: user.id,
+          name: user.fullName || 'Unknown',
+          email: userEmail,
+          imageUrl: user.imageUrl
+        },
         timestamp: Timestamp.now(),
-        imageUrl, // This will now be the base64 string
+        imageUrl: imageUrl, // This will now be the base64 string
         location: 'Custom Location',
-        isPublic: true
+        isPublic: true,
+        userEmail: userEmail
       };
 
-      console.log('Saving memory data:', memoryData);
+      // Log the memory data before saving (without the full image string for clarity)
+      console.log('Saving memory data:', {
+        ...memoryData,
+        imageUrl: imageUrl ? 'base64_string_present' : null
+      });
 
-      // Add to Firestore
-      const docRef = await addDoc(collection(db, 'memories'), memoryData);
-      console.log('Memory saved with ID:', docRef.id);
-
-      return;
+      await addDoc(collection(db, 'memories'), memoryData);
+      
+      // Refresh memories after saving
+      await loadMemories();
+      
     } catch (error) {
       console.error('Error in saveMemory:', error);
       throw error;
     }
+  };
+
+  const createPopupContent = (memory: Memory) => {
+    return `
+      <div class="memory-popup">
+        <h3>${memory.title}</h3>
+        <p>${memory.description}</p>
+        ${memory.imageUrl ? `<img src="${memory.imageUrl}" alt="${memory.title}" style="max-width: 100%; margin: 10px 0;">` : ''}
+        <span class="category-tag">${memory.category}</span>
+        <span class="date">${memory.timestamp.toDate().toLocaleDateString()}</span>
+        <span class="author">By: ${memory.user.email || 'Anonymous'}</span>
+      </div>
+    `;
   };
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
@@ -392,13 +468,20 @@ const App = () => {
         <>
           <div className="map-overlay">
             <div className="header">
-              <h1>Campus Chronicles</h1>
+              <h1 className="title-gradient font-inter">Campus Chronicles</h1>
               <div className="controls">
                 <select onChange={handleFilterChange}>
                   <option value="">All Memories</option>
                   <option value="study">Study</option>
                   <option value="hangout">Hangout</option>
                   <option value="event">Event</option>
+                  <option value="hackathon">Hackathon</option>
+                  <option value="work">Work</option>
+                  <option value="friends">Friends</option>
+                  <option value="food">Food</option>
+                  <option value="sports">Sports</option>
+                  <option value="club">Club</option>
+                  <option value="research">Research</option>
                 </select>
                 <button 
                   className={`add-memory-btn ${isAddingMemory ? 'active' : ''}`}
@@ -456,6 +539,13 @@ const App = () => {
                   <option value="study">Study</option>
                   <option value="hangout">Hangout</option>
                   <option value="event">Event</option>
+                  <option value="hackathon">Hackathon</option>
+                  <option value="work">Work</option>
+                  <option value="friends">Friends</option>
+                  <option value="food">Food</option>
+                  <option value="sports">Sports</option>
+                  <option value="club">Club</option>
+                  <option value="research">Research</option>
                 </select>
                 <div className="form-group">
                   <label htmlFor="image">Upload Image (optional)</label>
